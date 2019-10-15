@@ -38,10 +38,19 @@ namespace cvsRead
             try
             {
                 var fn = openFileDialog1.FileName;
+                DateTime start = DateTime.Now;
                 var cc = new CvsContainer(fn);
+                DateTime end = DateTime.Now;
+                System.Diagnostics.Debug.WriteLine("-------------");
+                System.Diagnostics.Debug.WriteLine((end - start).TotalMilliseconds);
 
                 System.Diagnostics.Debug.WriteLine(fn);
                 var sname = System.IO.Path.GetFileName(fn);
+
+                Series series1 = new Series();
+                series1.Name = sname;
+                series1.ChartType = SeriesChartType.Line;
+                chart1.Series.Add(series1);
 
                 //var sname = "Series1";
                 chart1.ChartAreas[0].AxisX.MajorGrid.Enabled = false;
@@ -49,9 +58,9 @@ namespace cvsRead
                 chart1.ChartAreas[0].AxisY.MajorGrid.Enabled = false;
                 chart1.ChartAreas[0].AxisY.MinorGrid.Enabled = false;
 
-                var ser = chart1.Series[sname];
-                ser.XValueType = ChartValueType.Date;
-                ser.YValueType = ChartValueType.Double;
+                //var ser = chart1.Series[sname];
+                series1.XValueType = ChartValueType.Date;
+                series1.YValueType = ChartValueType.Double;
                 //chart1.Series.Add(sname);
 
                 //foreach (var item in cc.mDTVals.Take(100))
