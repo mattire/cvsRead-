@@ -10,10 +10,12 @@ namespace cvsRead
     class CvsContainer
     {
         public List<DTVal> mDTVals;
+        public string Name { get; set; }
 
         public CvsContainer(string path)
         {
             var ls = System.IO.File.ReadAllLines(path).ToList();
+            #region SpeedTests
             //var times = ls.Select(l => l.Split(';')[0]).Select(s=>
             //                         Utils.SplitParseDT(s).ToOADate())
             //                         //DateTime.ParseExact(
@@ -29,7 +31,11 @@ namespace cvsRead
             //                        .ToList();
             //double.Parse(valStr.Replace(',', '.'), CultureInfo.InvariantCulture);
 
+            #endregion
             mDTVals = ls.Select(l => ParseLine(l)).ToList();
+
+            Name = System.IO.Path.GetFileName(path);
+            Managers.DataMngr.Instance.CvsContainers.Add(this);
         }
 
         public CvsContainer(List<string> lines)
