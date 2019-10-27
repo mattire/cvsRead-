@@ -7,10 +7,16 @@ using System.Threading.Tasks;
 
 namespace cvsRead
 {
+    enum CvsType {
+        Selig,
+        Normal
+    }
+
     class CvsContainer
     {
         public List<DTVal> mDTVals;
         public string Name { get; set; }
+        public CvsType Type { get; set; }
 
         public CvsContainer(string path)
         {
@@ -32,16 +38,30 @@ namespace cvsRead
             //double.Parse(valStr.Replace(',', '.'), CultureInfo.InvariantCulture);
 
             #endregion
-            mDTVals = ls.Select(l => ParseLine(l)).ToList();
+
+            Type= CheckType(ls.First());
+            ls = Type == CvsType.Normal ? ls.Skip(1).ToList() : ls;
+
+            mDTVals = Type == CvsType.Normal ? 
+                ls.Select(l =>  ParseLineNormal(l)).ToList() :
+                ls.Select(l => ParseLineSelig(l)).ToList();
 
             Name = System.IO.Path.GetFileName(path);
             Managers.DataMngr.Instance.CvsContainers.Add(this);
         }
 
+        private CvsType CheckType(string fstLine)
+        {
+            if (fstLine.StartsWith("Date,"))
+            { return CvsType.Normal; }
+            else
+            { return CvsType.Selig; }
+        }
+
         public CvsContainer(List<string> lines)
         {
 
-            mDTVals = lines.Select(l => ParseLine(l)).ToList();
+            mDTVals = lines.Select(l => ParseLineSelig(l)).ToList();
         }
 
         public struct DTVal
@@ -49,10 +69,18 @@ namespace cvsRead
             //public DateTime DT { get; set; }
             public double OADate { get; set; }
             public double Val { get; set; }
-
         }
 
-        private DTVal ParseLine(string line)
+        private DTVal ParseLineNormal(string line) {
+            var spl = line.Split(',');
+            var dtStr = spl[0];
+            var valStr = spl[6];
+            var dt = Utils.SplitParseDT2(dtStr);
+            var val = double.Parse(valStr.Replace(',', '.'), CultureInfo.InvariantCulture);
+            return new DTVal() { /*DT = dt,*/ OADate = dt.ToOADate(), Val = val };
+        }
+
+        private DTVal ParseLineSelig(string line)
         {
             var spl = line.Split(';');
             var dtStr = spl[0];

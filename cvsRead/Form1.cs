@@ -187,14 +187,19 @@ namespace cvsRead
         private void DragBarValueChanged(object sender, EventArgs e)
         {
             label2.Text = trackBar1.Value.ToString();
+        }
+
+        private void SlideLblTextChanged(object sender, EventArgs e)
+        {
             var si = (string)comboBox1.SelectedItem;
-            if (!string.IsNullOrWhiteSpace(si)) {
-                var sld = si.Substring(0, 3) + ".SA";
-                var ser = chart1.Series.FirstOrDefault(s => s.Name == sld);
+            if (!string.IsNullOrWhiteSpace(si))
+            {
+                var sld  = si.Substring(0, 3) + ".SA";
+                var ser  = chart1.Series.FirstOrDefault(s => s.Name == sld);
                 chart1.Series.Remove(ser);
                 var mngr = Managers.DataMngr.Instance;
-                var cvs = mngr.GetCvs(si);
-                var sa = mngr.GetSliding(si, trackBar1.Value);
+                var cvs  = mngr.GetCvs(si);
+                var sa   = mngr.GetSliding(si, trackBar1.Value);
                 AddSeries(sld, sa.MDTVals);
             }
         }
